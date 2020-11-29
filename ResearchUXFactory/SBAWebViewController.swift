@@ -32,10 +32,11 @@
 //
 
 import UIKit
+import WebKit
 
-open class SBAWebViewController: UIViewController, UIWebViewDelegate {
+open class SBAWebViewController: UIViewController, WKNavigationDelegate {
     
-    @IBOutlet weak var webView: UIWebView!
+    @IBOutlet weak var webView: WKWebView!
     
     open var url: URL?
     open var html: String?
@@ -46,12 +47,13 @@ open class SBAWebViewController: UIViewController, UIWebViewDelegate {
         super.viewDidLoad()
         
         if (webView == nil) {
-            self.view.backgroundColor = UIColor.white
-            let subview = UIWebView(frame: self.view.bounds)
+            let configuration = webViewConfiguration()
+//            self.view.backgroundColor = UIColor.white
+            let subview = WKWebView(frame: self.view.bounds, configuration: configuration)
             self.view.addSubview(subview)
             subview.constrainToFillSuperview()
-            subview.delegate = self
-            subview.dataDetectorTypes = .all
+            subview.navigationDelegate = self
+//            subview.dataDetectorTypes = .all
             subview.backgroundColor = UIColor.white
             self.webView = subview
         }
@@ -64,7 +66,7 @@ open class SBAWebViewController: UIViewController, UIWebViewDelegate {
             _webviewLoaded = true
             if let url = self.url {
                 let request = URLRequest(url: url)
-                webView.loadRequest(request)
+                webView.load(request)
             }
             else if let html = self.html {
                 // Include main bundle resourceURL as the baseURL so any stylesheets and images from the 
@@ -78,16 +80,24 @@ open class SBAWebViewController: UIViewController, UIWebViewDelegate {
         self.dismiss(animated: true, completion: nil)
     }
     
-    // MARK: - UIWebViewDelegate
-    open func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebView.NavigationType) -> Bool {
-
-        if let url = request.url , (navigationType == .linkClicked) {
-            UIApplication.shared.openURL(url)
-            return false
-        }
-        else {
-            return true
-        }
+//    // MARK: - UIWebViewDelegate
+//    open func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebView.NavigationType) -> Bool {
+//
+//        if let url = request.url , (navigationType == .linkClicked) {
+//            UIApplication.shared.openURL(url)
+//            return false
+//        }
+//        else {
+//            return true
+//        }
+//    }
+    
+    /// Set up the desired configuration for the webview. Default implementation activates all data detector types.
+    open func webViewConfiguration() -> WKWebViewConfiguration {
+        let configuration = WKWebViewConfiguration()
+        configuration.dataDetectorTypes = .all
+        return configuration
     }
+
 
 }
